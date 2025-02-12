@@ -75,13 +75,13 @@ def tinyMazeSearch(problem):
 
 def isAdj(current,prev):
     flag = 0
-    if(current[0]==prev[0]-1):
+    if(current[0]==prev[0]-1 and current[1]==prev[1]):
         flag = 1
-    elif(current[0]==prev[0]+1):
+    elif(current[0]==prev[0]+1 and current[1]==prev[1]):
         flag = 1
-    elif(current[1]==prev[1]-1):
+    elif(current[1]==prev[1]-1 and current[0]==prev[0]):
         flag = 1
-    elif(current[0]==prev[0]+1):
+    elif(current[1]==prev[1]+1 and current[0]==prev[0]):
         flag = 1
 
     return flag
@@ -157,10 +157,11 @@ def depthFirstSearch(problem):
     while closed:
         
         prev = closed.pop()
-        #if(isAdj(current,prev)==0):
-            #continue
-
         print("current:",current,"prev:",prev)
+        if(isAdj(current,prev)==0):
+            continue
+
+        
         dir = stateToDir(current,prev)
         if(dir != []):
             path.insert(0,dir)
