@@ -99,7 +99,7 @@ def stateToDir(current, prev):
         r=e
     elif(current[1]==prev[1]-1):
         r=s
-    elif(current[0]==prev[0]+1):
+    elif(current[1]==prev[1]+1):
         r=n
 
     print(r,"\n")
