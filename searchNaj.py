@@ -92,57 +92,65 @@ def depthFirstSearch(problem):
     util.raiseNotDefined()
 
 
+class Node:
+    def __init__(self, state, action, cost, parent):
+        self.state = state
+        self.action = action
+        self.cost = cost
+        self.parent = parent
+
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    from pacman import GameState
-    from searchAgents import PositionSearchProblem, SearchAgent
     from util import Queue
-    from util import Stack
-    current = PositionSearchProblem.getStartState(problem)  # initialize state to start state in problem
+    current = Node(problem.getStartState(), '', 0, None)  # initialize state to start state in problem
     closed = []
     open = Queue()  # use queue data structure from util.py for BFS
-    while not PositionSearchProblem.isGoalState(problem, current):  # loop until current state is the goal state
-        closed.append(current)  # add current state to closed list
-        successors = PositionSearchProblem.getSuccessors(problem, current)  # retrieve successor state list
+    while not problem.isGoalState(current.state):  # loop until current state is the goal state
+        """if count != 0:
+            current = open.pop()  # set current to next node in open
+        count += 1"""
+        if current.state not in closed:
+            closed.append(current.state)  # add current state to closed list
+        successors = problem.getSuccessors(current.state)  # retrieve successor state list
         for s in successors:  # add successors not in closed to open
-            if s not in closed:
-                open.push(s)
-        current = open.pop()  # set current to next node in open
-    path = Stack()
-    for state in closed:
-        if current not in state:
-            closed.remove(state)
-    i = 0
-    while len(closed) > 0:
-        path.push(current[1])
-        current = closed.pop()
+            if s[0] not in closed:
+                new = Node(s[0],s[1],s[2],current)
+                open.push(new)
+        current = open.pop()
+        while current.state in closed:
+            current = open.pop()
+    path = list()
+    while current.parent:
+        path.insert(0,current.action)
+        current = current.parent
     return path
     util.raiseNotDefined()
 
-
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    from searchAgents import PositionSearchProblem, SearchAgent
-    from util import PriorityQueue
-    from util import Stack
-    current = PositionSearchProblem.getStartState(problem)  # initialize state to start state in problem
+    from util import Queue
+    current = Node(problem.getStartState(), '', 0, None)  # initialize state to start state in problem
     closed = []
-    open = PriorityQueue()  # use queue data structure from util.py for BFS
-    while not PositionSearchProblem.isGoalState(problem, current):  # loop until current state is the goal state
-        closed.append(current)  # add current state to closed list
-        successors = PositionSearchProblem.getSuccessors(problem, current)  # retrieve successor state list
+    open = Queue()  # use queue data structure from util.py for BFS
+    while not problem.isGoalState(current.state):  # loop until current state is the goal state
+        """if count != 0:
+            current = open.pop()  # set current to next node in open
+        count += 1"""
+        if current.state not in closed:
+            closed.append(current.state)  # add current state to closed list
+        successors = problem.getSuccessors(current.state)  # retrieve successor state list
         for s in successors:  # add successors not in closed to open
-            if s not in closed:
-                open.push(s, s[2])
-        current = open.pop()  # set current to next node in open
-    path = Stack()
-    for state in closed:
-        if current not in state:
-            closed.remove(state)
-    i = 0
-    while len(closed) > 0:
-        path.push(current[1])
-        current = closed.pop()
+            if s[0] not in closed:
+                new = Node(s[0],s[1],s[2],current)
+                open.push(new)
+        current = open.pop()
+        while current.state in closed:
+            current = open.pop()
+    path = list()
+    while current.parent:
+        path.insert(0,current.action)
+        current = current.parent
     return path
 
     util.raiseNotDefined()
