@@ -73,9 +73,12 @@ class Node:
     def __eq__(self,other):
         return (self.crd == other.crd)
 
-    def makeNode(crd,dir,cost,parent):
-        node = Node(crd,dir,cost,parent)
-        return node
+    def __lt__(self,other):
+        return (self.cost<other.cost)
+    def __str__(self):
+        r = " " + str(self.crd)
+        return r
+
 
 def tinyMazeSearch(problem):
     """
@@ -119,7 +122,7 @@ def stateToDir(current):
     else:
         r = "NA"
 
-    print(r,"\n")
+
 
     return r
 
@@ -133,9 +136,9 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
     from game import Directions
@@ -151,49 +154,33 @@ def depthFirstSearch(problem):
 
 
     
-    print(current)
-    #print(problem.getSuccessors(problem.getStartState()))
+    #print(current)
+    ##print(problem.getSuccessors(problem.getStartState()))
     count = 0
 
     while not problem.isGoalState(current.crd):
         parent = current
         if(count !=0):
             current = open.pop()
-            #current = Node(current.crd,current.dir,current.cost,parent)
-        
-        #print("crd:",current.crd,"dir:",current.dir,"cost:",current.cost)
-        #print(current)
         count += 1
-        #if count >= 100:
-        #   break
-
-#-------------------------------------------------------------------------------------
         if current not in closed:
             closed.append(current)
         for successor in problem.getSuccessors(current.crd):
-            #print(successor[2])
             successor = Node(successor[0],successor[1],successor[2]+current.cost,current)
             if successor not in closed:
                 open.append(successor)
-        
-        
     path = list()
-    #print(closed)
     current = closed.pop()
+
     while current.parent:
-        print(current.crd)
         dir=stateToDir(current)
         if dir!="NA":
             path.insert(0,dir)
         current = current.parent
 
-
-        
-
-    #print(path)
     return path
     
-    #return closed[1:]
+
     
     
 
@@ -217,8 +204,43 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    from util import PriorityQueue
+    #visited = set()
+    closed = list()
+    open = PriorityQueue()
+    current = Node(problem.getStartState(),None,0,None)
+    count = 0
+    print("\n\n\nhey\n\n\n")
+    while not problem.isGoalState(current.crd):
+        #print(current.crd,"\n")
+        if(count !=0):
+            current = open.pop()
+        count += 1
 
-    util.raiseNotDefined()
+        print(count)
+        if current not in closed:
+            closed.append(current)
+        for successor in problem.getSuccessors(current.crd):
+            #for i,node in enumerate(closed):
+                #print("index: ",i,node)
+            successor = Node(successor[0],successor[1],successor[2]+current.cost,current)
+            priority = int(heuristic(successor.crd,problem))+successor.cost
+            if successor not in closed:
+                open.push(successor,priority)
+            
+            
+
+    path = list()
+    #current = closed.pop()
+    while current.parent:
+        dir=stateToDir(current)
+        if dir!="NA":
+            path.insert(0,dir)
+        current = current.parent
+
+    return path
+
+
 
 
 # Abbreviations
