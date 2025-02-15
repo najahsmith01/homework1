@@ -288,6 +288,8 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.cornersVisited = []
+        self.visited = []
 
     def getStartState(self):
         """
@@ -295,14 +297,19 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        state = (self.startingPosition, self.cornersVisited)
+        return state
+        
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if len(state[1]) == 4:
+            return True
+        return False
+        #util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -323,6 +330,16 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                newVisited = state[1]
+                nextPos = (nextx, nexty)
+                if nextPos in self.corners and nextPos not in self.cornersVisited:
+                    newVisited.append(nextPos)
+                successors.append(((nextPos, newVisited), action, 1))
 
             "*** YOUR CODE HERE ***"
 
@@ -360,7 +377,30 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    position = state[0]
+    cornersVisited = state[1]
+
+    if len(cornersVisited) == 4:
+        return 0
+    cornersLeft = []
+    for c in problem.corners:
+        if c not in cornersVisited:
+            cornersLeft.append(c)
+    maxDist = max(util.manhattanDistance(position, c) for c in cornersLeft)
+    estimate = 0
+    tempPos = position
+
+    def getDist(pos):
+        return util.manhattanDistance(position, pos)
+
+    while len(cornersLeft) > 0:
+        tempCorner = min(cornersLeft, key=getDist)
+        estimate += util.manhattanDistance(tempPos, tempCorner)
+        tempPos = tempCorner
+        cornersLeft.remove(tempCorner)
+    return max(maxDist, estimate)
+
+    #return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -474,6 +514,8 @@ def foodHeuristic(state, problem):
     #pick a starting vertex
     if(len(foodList)==0):
         return 0
+    elif(len(foodList)==1):
+        return dist(foodList[0],position)
     min_distance = 99999
     min_index = -1
     tree_start = foodList[0],0,0    #distance, from index, to index
@@ -482,7 +524,8 @@ def foodHeuristic(state, problem):
             min_index = i
             tree_start = foodList[i]
             min_distance = dist(foodList[i],position)
-            visited[i] = True
+    visited[min_index]=True
+    tree_cost += dist(foodList[min_index],position)
     for i in range(n):
         if visited[i]:
             continue
