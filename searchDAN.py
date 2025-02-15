@@ -147,21 +147,19 @@ def depthFirstSearch(problem):
     e = Directions.EAST
     w = Directions.WEST
 
-    visited = set()
+
     closed = list()
     open = []
     current = Node(problem.getStartState(),None,0,None)
 
-
-    
-    #print(current)
-    ##print(problem.getSuccessors(problem.getStartState()))
     count = 0
 
     while not problem.isGoalState(current.crd):
-        parent = current
+        #parent = current
         if(count !=0):
             current = open.pop()
+        if problem.isGoalState(current.crd):
+                break
         count += 1
         if current not in closed:
             closed.append(current)
@@ -170,12 +168,15 @@ def depthFirstSearch(problem):
             if successor not in closed:
                 open.append(successor)
     path = list()
-    current = closed.pop()
+    path1 = list()
+    #current = closed.pop()
 
     while current.parent:
+        path1.insert(0,current)
         dir=stateToDir(current)
-        if dir!="NA":
-            path.insert(0,dir)
+        #if dir!="NA":
+        #    path.insert(0,dir)
+        path.insert(0,current.dir)
         current = current.parent
 
     return path
@@ -205,37 +206,31 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     from util import PriorityQueue
-    #visited = set()
     closed = list()
     open = PriorityQueue()
     current = Node(problem.getStartState(),None,0,None)
     count = 0
-    print("\n\n\nhey\n\n\n")
     while not problem.isGoalState(current.crd):
-        #print(current.crd,"\n")
         if(count !=0):
             current = open.pop()
+        if(problem.isGoalState(current.crd)):
+            break
         count += 1
-
-        print(count)
         if current not in closed:
             closed.append(current)
-        for successor in problem.getSuccessors(current.crd):
-            #for i,node in enumerate(closed):
-                #print("index: ",i,node)
-            successor = Node(successor[0],successor[1],successor[2]+current.cost,current)
-            priority = int(heuristic(successor.crd,problem))+successor.cost
-            if successor not in closed:
-                open.push(successor,priority)
+            for successor in problem.getSuccessors(current.crd):
+                successor = Node(successor[0],successor[1],successor[2]+current.cost,current)
+                priority = int(heuristic(successor.crd,problem))+successor.cost
+                if successor not in closed:
+                    open.push(successor,priority)
             
             
-
     path = list()
-    #current = closed.pop()
     while current.parent:
         dir=stateToDir(current)
-        if dir!="NA":
-            path.insert(0,dir)
+        #if dir!="NA":
+        #path.insert(0,dir)
+        path.insert(0,current.dir)
         current = current.parent
 
     return path
