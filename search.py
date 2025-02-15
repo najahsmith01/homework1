@@ -95,7 +95,6 @@ def depthFirstSearch(problem):
     e = Directions.EAST
     w = Directions.WEST
 
-    visited = set()
     closed = list()
     open = []
     current = Node2(problem.getStartState(),None,0,None)
@@ -103,9 +102,10 @@ def depthFirstSearch(problem):
     count = 0
 
     while not problem.isGoalState(current.crd):
-        parent = current
         if(count !=0):
             current = open.pop()
+        if problem.isGoalState(current.crd):
+            break
         count += 1
         if current not in closed:
             closed.append(current)
@@ -114,15 +114,15 @@ def depthFirstSearch(problem):
             if successor not in closed:
                 open.append(successor)
     path = list()
-    current = closed.pop()
+    path1 = list()
 
     while current.parent:
+        path1.insert(0,current)
         dir=stateToDir(current)
-        if dir!="NA":
-            path.insert(0,dir)
+        path.insert(0,current.dir)
         current = current.parent
+
     return path
-    util.raiseNotDefined()
 
 
 def isAdj(current, prev):
@@ -153,24 +153,17 @@ def breadthFirstSearch(problem):
     current = Node(problem.getStartState(), '', 0, None)  # initialize state to start state in problem
     closed = []
     open = Queue()  # use queue data structure from util.py for BFS
-    count = 0
     while not problem.isGoalState(current.state):  # loop until current state is the goal state
-        """if count != 0:
-            current = open.pop()
-        else:
-            count += 1"""
         if current.state not in closed:
             closed.append(current.state)  # add current state to closed list
         successors = problem.getSuccessors(current.state)  # retrieve successor state list
         for s in successors:  # add successors not in closed to open
             if s[0] not in closed:
-                new = Node(s[0], s[1], s[2], current)
+                new = Node(s[0], s[1], s[2] + current.cost, current)
                 open.push(new)
-        count += 1
-        if not open.isEmpty():
+        current = open.pop()
+        while current.state in closed:
             current = open.pop()
-        else:
-            return []
     path = list()
     while current.parent:
         path.insert(0, current.action)
@@ -261,27 +254,26 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     current = Node2(problem.getStartState(), None, 0, None)
     count = 0
     while not problem.isGoalState(current.crd):
-        if count != 0:
+        if (count != 0):
             current = open.pop()
+        if (problem.isGoalState(current.crd)):
+            break
         count += 1
-
-        print(count)
         if current not in closed:
             closed.append(current)
-        for successor in problem.getSuccessors(current.crd):
-            successor = Node2(successor[0], successor[1], successor[2] + current.cost, current)
-            priority = int(heuristic(successor.crd, problem)) + successor.cost
-            if successor not in closed:
-                open.push(successor, priority)
+            for successor in problem.getSuccessors(current.crd):
+                successor = Node2(successor[0], successor[1], successor[2] + current.cost, current)
+                priority = int(heuristic(successor.crd, problem)) + successor.cost
+                if successor not in closed:
+                    open.push(successor, priority)
 
     path = list()
     while current.parent:
         dir = stateToDir(current)
-        if dir != "NA":
-            path.insert(0, dir)
+        path.insert(0, current.dir)
         current = current.parent
+
     return path
-    util.raiseNotDefined()
 
 
 # Abbreviations
